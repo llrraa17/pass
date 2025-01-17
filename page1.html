@@ -29,7 +29,7 @@
         .piece {
             width: 100%;
             aspect-ratio: 1 / 1;
-            background-size: 400px 400px;
+            background-size: 400px 400px; /* Adjust to match puzzle dimensions */
             cursor: pointer;
             border: 1px solid #ddd;
         }
@@ -38,8 +38,16 @@
             opacity: 0.7;
         }
 
-        .puzzle-container.completed {
+        .completed {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-size: cover;
             cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
         }
     </style>
 </head>
@@ -49,7 +57,7 @@
         const container = document.getElementById("puzzle-container");
 
         // Image URL for the puzzle
-        const imageURL = "https://i.pinimg.com/736x/58/47/a9/5847a96863422c257fbfcfd90a26a9dd.jpg";
+        const imageURL = "https://i.pinimg.com/736x/58/47/a9/5847a96863422c257fbfcfd90a26a9dd.jpg"; // Your single image
         const rows = 4;
         const cols = 4;
 
@@ -110,12 +118,25 @@
             });
 
             if (isComplete) {
-                // Add a class to indicate completion and
+                transformToButton();
+            }
+        }
 
+        // Transform puzzle into a button
+        function transformToButton() {
+            container.innerHTML = ""; // Clear container
+            const button = document.createElement("div");
+            button.classList.add("completed");
+            button.style.backgroundImage = `url(${imageURL})`;
+            button.innerText = "Click Me!";
+            button.addEventListener("click", () => {
+                alert("Did you like it?");
+            });
+            container.appendChild(button);
+        }
+    </script>
+</body>
+</html>
 
-
-
-           
-
-           
-          
+       
+            
