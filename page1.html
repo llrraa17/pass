@@ -17,22 +17,23 @@
 
         .puzzle-container {
             display: grid;
-            grid-template-columns: repeat(4, 100px);
-            grid-gap: 5px;
-            margin: auto;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            width: 90vw;
+            max-width: 400px;
         }
 
         .piece {
-            width: 100px;
-            height: 100px;
+            width: 100%;
+            aspect-ratio: 1 / 1;
             border: 1px solid #ddd;
-            background-size: 400px 400px;
-            cursor: grab;
+            background-size: 100% 100%;
+            cursor: pointer;
+            user-select: none;
         }
 
-        .piece.dragging {
-            opacity: 0.5;
-            cursor: grabbing;
+        .piece.active {
+            opacity: 0.7;
         }
     </style>
 </head>
@@ -42,11 +43,12 @@
         const container = document.getElementById("puzzle-container");
 
         // Image URL for the puzzle
-        const imageURL = "https://i.pinimg.com/736x/58/47/a9/5847a96863422c257fbfcfd90a26a9dd.jpg"; // Replace this with your image URL
+        const imageURL = "https://i.pinimg.com/736x/58/47/a9/5847a96863422c257fbfcfd90a26a9dd.jpg";
         const rows = 4;
         const cols = 4;
 
         let pieces = [];
+        let activePiece = null;
 
         // Create puzzle pieces
         for (let row = 0; row < rows; row++) {
@@ -54,7 +56,7 @@
                 const piece = document.createElement("div");
                 piece.classList.add("piece");
                 piece.style.backgroundImage = `url(${imageURL})`;
-                piece.style.backgroundPosition = `${-col * 100}px ${-row * 100}px`;
+                piece.style.backgroundPosition = `${-col * 100}% ${-row * 100}%`;
                 piece.dataset.correctPosition = `${row}-${col}`;
                 piece.dataset.currentPosition = `${row}-${col}`;
                 pieces.push(piece);
@@ -64,44 +66,30 @@
         // Shuffle pieces
         pieces = pieces.sort(() => Math.random() - 0.5);
 
-        // Append shuffled pieces to the containe
-        container
+        // Append shuffled pieces to the container
         pieces.forEach(piece => container.appendChild(piece));
 
-        // Drag and Drop Logic
-        let draggedPiece = null;
-
-        container.addEventListener("dragstart", (e) => {
+        // Touch handling logic
+        container.addEventListener("click", (e) => {
             if (e.target.classList.contains("piece")) {
-                draggedPiece = e.target;
-                e.target.classList.add("dragging");
-            }
-        });
+                if (!activePiece) {
+                    // Select the piece
+                    activePiece = e.target;
+                    activePiece.classList.add("active");
+                } else {
+                    // Swap pieces
+                    const target = e.target;
+                    const activeIndex = Array.from(container.children).indexOf(activePiece);
+                    const targetIndex = Array.from(container.children).indexOf(target);
 
-        container.addEventListener("dragover", (e) => {
-            e.preventDefault();
-        });
+                    container.insertBefore(activePiece, target);
+                    container.insertBefore(target, container.children[activeIndex]);
 
-        container.addEventListener("drop", (e) => {
-            const target = e.target;
+                    activePiece.classList.remove("active");
+                    activePiece = null;
 
-            if (target.classList.contains("piece") && draggedPiece) {
-                const draggedIndex = Array.from(container.children).indexOf(draggedPiece);
-                const targetIndex = Array.from(container.children).indexOf(target);
-
-                container.insertBefore(draggedPiece, target);
-                container.insertBefore(target, container.children[draggedIndex]);
-
-                draggedPiece.classList.remove("dragging");
-                draggedPiece = null;
-
-                checkCompletion();
-            }
-        });
-
-        container.addEventListener("dragend", (e) => {
-            if (e.target.classList.contains("piece")) {
-                e.target.classList.remove("dragging");
+                    checkCompletion();
+                }
             }
         });
 
@@ -120,11 +108,7 @@
         }
     </script>
 </body>
-
-
-
-
-
+</html>
 
 
 
